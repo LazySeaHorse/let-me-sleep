@@ -41,6 +41,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             LetMeSleepTheme {
                 var userValue by remember { mutableStateOf("") }
+                var ringDuration by remember { mutableStateOf("10") }
+                var snoozeDuration by remember { mutableStateOf("5") }
+                var snoozeLimit by remember { mutableStateOf("3") }
+
                 val viewModel = viewModel<MainViewModel>()
                 val time = viewModel.countdownFlow.collectAsState(initial = 0)
                 val isTimerComplete = viewModel.isCountdownComplete.collectAsState()
@@ -73,9 +77,20 @@ class MainActivity : ComponentActivity() {
                     angle = angle,
                     userValue = userValue,
                     onUserValueChange = { userValue = it },
+                    ringDuration = ringDuration,
+                    onRingDurationChange = { ringDuration = it },
+                    snoozeDuration = snoozeDuration,
+                    onSnoozeDurationChange = { snoozeDuration = it },
+                    snoozeLimit = snoozeLimit,
+                    onSnoozeLimitChange = { snoozeLimit = it },
                     onStartClick = {
-                        userValue.toIntOrNull()?.let { seconds ->
-                            viewModel.startCountdown(seconds)
+                        val duration = userValue.toIntOrNull()
+                        val ring = ringDuration.toIntOrNull() ?: 10
+                        val snooze = snoozeDuration.toIntOrNull() ?: 5
+                        val limit = snoozeLimit.toIntOrNull() ?: 3
+
+                        if (duration != null) {
+                            viewModel.startCountdown(duration, ring, snooze, limit)
                         }
                     },
                     snackbarHost = {

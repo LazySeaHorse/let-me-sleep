@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 fun TimerInput(
     value: String,
     onValueChange: (String) -> Unit,
+    label: String,
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -36,7 +37,7 @@ fun TimerInput(
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
-        label = { Text("Enter seconds", color = Color.Gray) },
+        label = { Text(label, color = Color.Gray) },
         singleLine = true,
         shape = RoundedCornerShape(20.dp)
     )

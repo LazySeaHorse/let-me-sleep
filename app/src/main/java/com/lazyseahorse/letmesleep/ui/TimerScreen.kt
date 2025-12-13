@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +27,12 @@ fun TimerScreen(
     angle: Float,
     userValue: String,
     onUserValueChange: (String) -> Unit,
+    ringDuration: String,
+    onRingDurationChange: (String) -> Unit,
+    snoozeDuration: String,
+    onSnoozeDurationChange: (String) -> Unit,
+    snoozeLimit: String,
+    onSnoozeLimitChange: (String) -> Unit,
     onStartClick: () -> Unit,
     snackbarHost: @Composable () -> Unit
 ) {
@@ -40,7 +48,9 @@ fun TimerScreen(
                 .background(Color(0xFF1A1A1A))
         ) {
             Column(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Animated timer text
@@ -50,7 +60,26 @@ fun TimerScreen(
 
                 TimerInput(
                     value = userValue,
-                    onValueChange = onUserValueChange
+                    onValueChange = onUserValueChange,
+                    label = "Timer Duration (s)"
+                )
+
+                TimerInput(
+                    value = ringDuration,
+                    onValueChange = onRingDurationChange,
+                    label = "Ring Duration (s)"
+                )
+
+                TimerInput(
+                    value = snoozeDuration,
+                    onValueChange = onSnoozeDurationChange,
+                    label = "Snooze Duration (s)"
+                )
+
+                TimerInput(
+                    value = snoozeLimit,
+                    onValueChange = onSnoozeLimitChange,
+                    label = "Auto Snooze Limit"
                 )
 
                 Spacer(modifier = Modifier.height(30.dp))
