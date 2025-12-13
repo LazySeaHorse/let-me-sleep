@@ -39,6 +39,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lazyseahorse.letmesleep.ui.TimerScreen
 import com.lazyseahorse.letmesleep.ui.theme.LetMeSleepTheme
 import com.lazyseahorse.letmesleep.utils.VibrationHelper
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import kotlinx.coroutines.launch
 import com.lazyseahorse.letmesleep.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
@@ -89,6 +97,23 @@ class MainActivity : ComponentActivity() {
                 val time = viewModel.countdownFlow.collectAsState(initial = 0)
                 val isTimerComplete = viewModel.isCountdownComplete.collectAsState()
                 val snackBarHostState = remember { SnackbarHostState() }
+                val scope = rememberCoroutineScope()
+                
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { isGranted ->
+                        if (isGranted) {
+                             // Retry logic could go here, or just let user click again
+                             scope.launch {
+                                 snackBarHostState.showSnackbar("Permission granted! Press Start again.")
+                             }
+                        } else {
+                            scope.launch {
+                                snackBarHostState.showSnackbar("Notifications needed for alarm UI.")
+                            }
+                        }
+                    }
+                )
                 
                 // --- Debug Feature Flag ---
                 val SHOW_DEBUG_TAB = true // Set to FALSE to disable in production
@@ -174,6 +199,7 @@ class MainActivity : ComponentActivity() {
                                  onSnoozeDurationChange = { snoozeDuration = it },
                                  snoozeLimit = snoozeLimit,
                                  onSnoozeLimitChange = { snoozeLimit = it },
+
                                  onStartClick = {
                                      val duration = userValue.toIntOrNull()
                                      val ring = ringDuration.toIntOrNull() ?: 10
@@ -181,10 +207,26 @@ class MainActivity : ComponentActivity() {
                                      val limit = snoozeLimit.toIntOrNull() ?: 3
 
                                      if (duration != null) {
-                                         viewModel.startCountdown(duration, ring, snooze, limit)
+                                         // Permission Check for Android 13+
+                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                             if (ContextCompat.checkSelfPermission(
+                                                     this@MainActivity,
+                                                     Manifest.permission.POST_NOTIFICATIONS
+                                                 ) == PackageManager.PERMISSION_GRANTED
+                                             ) {
+                                                 viewModel.startCountdown(duration, ring, snooze, limit)
+                                             } else {
+                                                 // Request Permission (Optimistic: Start timer after grant is handled in launcher, 
+                                                 // but for simplicity, we just ask here. User has to click start again or we handle callback better)
+                                                 // Ideally, we'd trigger a callback in launcher, but straightforward request is better than crash/silent fail.
+                                                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                             }
+                                         } else {
+                                             viewModel.startCountdown(duration, ring, snooze, limit)
+                                         }
                                      }
                                  },
-                                 snackbarHost = {} // Handled by outer scaffold now, or pass empty if we want inside
+                                 snackbarHost = {} 
                              )
                          } else {
                              com.lazyseahorse.letmesleep.ui.DebugScreen()
