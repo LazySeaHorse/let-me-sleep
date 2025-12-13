@@ -50,65 +50,108 @@ class MainActivity : ComponentActivity() {
                 val time = viewModel.countdownFlow.collectAsState(initial = 0)
                 val isTimerComplete = viewModel.isCountdownComplete.collectAsState()
                 val snackBarHostState = remember { SnackbarHostState() }
+                
+                // --- Debug Feature Flag ---
+                val SHOW_DEBUG_TAB = true // Set to FALSE to disable in production
+                
+                var selectedTab by remember { mutableStateOf(0) } // 0 = Timer, 1 = Debug
 
-                LaunchedEffect(isTimerComplete.value) {
-                    if (isTimerComplete.value) {
-                        vibrationHelper.vibrateOnComplete()
-
-                        snackBarHostState.showSnackbar(
-                            message = "Timer Completed",
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
-
-                //Animation State
-                val rotation = rememberInfiniteTransition()
-                val angle by rotation.animateFloat(
-                    initialValue = 0f,
-                    targetValue = 360f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(2000, easing = LinearEasing),
-                        repeatMode = RepeatMode.Restart
-                    )
-                )
-
-                TimerScreen(
-                    time = time.value,
-                    angle = angle,
-                    userValue = userValue,
-                    onUserValueChange = { userValue = it },
-                    ringDuration = ringDuration,
-                    onRingDurationChange = { ringDuration = it },
-                    snoozeDuration = snoozeDuration,
-                    onSnoozeDurationChange = { snoozeDuration = it },
-                    snoozeLimit = snoozeLimit,
-                    onSnoozeLimitChange = { snoozeLimit = it },
-                    onStartClick = {
-                        val duration = userValue.toIntOrNull()
-                        val ring = ringDuration.toIntOrNull() ?: 10
-                        val snooze = snoozeDuration.toIntOrNull() ?: 5
-                        val limit = snoozeLimit.toIntOrNull() ?: 3
-
-                        if (duration != null) {
-                            viewModel.startCountdown(duration, ring, snooze, limit)
+                Scaffold(
+                    bottomBar = {
+                        if (SHOW_DEBUG_TAB) {
+                            NavigationBar {
+                                NavigationBarItem(
+                                    selected = selectedTab == 0,
+                                    onClick = { selectedTab = 0 },
+                                    label = { Text("Timer") },
+                                    icon = {
+                                        Icon(
+                                            imageVector = androidx.compose.material.icons.Icons.Default.Home,
+                                            contentDescription = "Timer"
+                                        ) 
+                                    }
+                                )
+                                NavigationBarItem(
+                                    selected = selectedTab == 1,
+                                    onClick = { selectedTab = 1 },
+                                    label = { Text("Debug") },
+                                    icon = {
+                                        Icon(
+                                            imageVector = androidx.compose.material.icons.Icons.Default.Info, // Or List
+                                            contentDescription = "Debug"
+                                        ) 
+                                    }
+                                )
+                            }
                         }
                     },
                     snackbarHost = {
-                        SnackbarHost(
-                            hostState = snackBarHostState,
-                            snackbar = { snackBarData ->
-                                Snackbar(
-                                    snackbarData = snackBarData,
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    actionColor = MaterialTheme.colorScheme.primary,
-                                    dismissActionContentColor = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(16.dp)
-                                )
-                            })
+                         SnackbarHost(
+                             hostState = snackBarHostState,
+                             snackbar = { snackBarData ->
+                                 Snackbar(
+                                     snackbarData = snackBarData,
+                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                     actionColor = MaterialTheme.colorScheme.primary,
+                                     dismissActionContentColor = MaterialTheme.colorScheme.primary,
+                                     modifier = Modifier.padding(16.dp)
+                                 )
+                             })
+                     }
+                ) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                         if (selectedTab == 0) {
+                             LaunchedEffect(isTimerComplete.value) {
+                                 if (isTimerComplete.value) {
+                                     vibrationHelper.vibrateOnComplete()
+
+                                     snackBarHostState.showSnackbar(
+                                         message = "Timer Completed",
+                                         duration = SnackbarDuration.Short
+                                     )
+                                 }
+                             }
+
+                             //Animation State
+                             val rotation = rememberInfiniteTransition()
+                             val angle by rotation.animateFloat(
+                                 initialValue = 0f,
+                                 targetValue = 360f,
+                                 animationSpec = infiniteRepeatable(
+                                     animation = tween(2000, easing = LinearEasing),
+                                     repeatMode = RepeatMode.Restart
+                                 )
+                             )
+
+                             TimerScreen(
+                                 time = time.value,
+                                 angle = angle,
+                                 userValue = userValue,
+                                 onUserValueChange = { userValue = it },
+                                 ringDuration = ringDuration,
+                                 onRingDurationChange = { ringDuration = it },
+                                 snoozeDuration = snoozeDuration,
+                                 onSnoozeDurationChange = { snoozeDuration = it },
+                                 snoozeLimit = snoozeLimit,
+                                 onSnoozeLimitChange = { snoozeLimit = it },
+                                 onStartClick = {
+                                     val duration = userValue.toIntOrNull()
+                                     val ring = ringDuration.toIntOrNull() ?: 10
+                                     val snooze = snoozeDuration.toIntOrNull() ?: 5
+                                     val limit = snoozeLimit.toIntOrNull() ?: 3
+
+                                     if (duration != null) {
+                                         viewModel.startCountdown(duration, ring, snooze, limit)
+                                     }
+                                 },
+                                 snackbarHost = {} // Handled by outer scaffold now, or pass empty if we want inside
+                             )
+                         } else {
+                             com.lazyseahorse.letmesleep.ui.DebugScreen()
+                         }
                     }
-                )
+                }
             }
         }
     }

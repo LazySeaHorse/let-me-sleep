@@ -43,6 +43,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     ) {
         // Cancel any existing job/alarm
         stopTimer()
+        
+        com.lazyseahorse.letmesleep.utils.AppLogger.log("MainViewModel", "Timer Started: ${timeInSeconds}s")
 
         val context = getApplication<Application>()
         val triggerTime = System.currentTimeMillis() + (timeInSeconds * 1000L)

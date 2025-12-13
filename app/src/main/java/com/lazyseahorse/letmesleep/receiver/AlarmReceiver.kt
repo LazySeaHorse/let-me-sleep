@@ -14,6 +14,7 @@ class AlarmReceiver : BroadcastReceiver() {
             val powerManager = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
             val wakeLock = powerManager.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "LetMeSleep:AlarmReceiverLock")
             wakeLock.acquire(3000L) // 3 seconds timeout
+            com.lazyseahorse.letmesleep.utils.AppLogger.log("AlarmReceiver", "Alarm Received! WakeLock acquired.")
 
             val startIntent = Intent(context, TimerService::class.java).apply {
                 this.action = Constants.ACTION_START_ALARM

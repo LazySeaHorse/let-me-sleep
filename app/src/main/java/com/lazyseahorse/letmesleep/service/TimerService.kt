@@ -30,9 +30,11 @@ class TimerService : Service() {
                 val snoozeDuration = intent.getIntExtra(Constants.EXTRA_SNOOZE_DURATION, 60)
                 val autoSnoozeLimit = intent.getIntExtra(Constants.EXTRA_AUTO_SNOOZE_LIMIT, 3)
 
+                com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Start Alarm: SnoozeCount=$snoozeCount, Ring=$ringDuration, SnoozeDur=$snoozeDuration")
                 startRinging(snoozeCount, ringDuration, snoozeDuration, autoSnoozeLimit)
             }
             Constants.ACTION_STOP_ALARM -> {
+                com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Stop Alarm Requested")
                 stopSelf()
             }
         }
@@ -66,8 +68,10 @@ class TimerService : Service() {
                 prepare()
                 start()
             }
+            com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Playing sound...")
         } catch (e: Exception) {
             e.printStackTrace()
+            com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Error playing sound: ${e.message}")
         }
 
         // 3. Schedule Auto-Stop (Auto Snooze)
@@ -78,7 +82,10 @@ class TimerService : Service() {
             // Time's up for ringing!
             if (currentSnoozeCount < autoSnoozeLimit) {
                 // Schedule next Snooze
+                com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Auto-snoozing...")
                 scheduleSnooze(currentSnoozeCount + 1, snoozeDurationSeconds, ringDurationSeconds, autoSnoozeLimit)
+            } else {
+                com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Auto-snooze limit reached. Stopping.")
             }
             // Stop this service (silence)
             stopSelf()
@@ -119,6 +126,7 @@ class TimerService : Service() {
         } else {
              alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
+        com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Snooze scheduled for ${snoozeDurationSeconds}s from now")
     }
 
     override fun onDestroy() {
@@ -127,5 +135,6 @@ class TimerService : Service() {
         mediaPlayer?.release()
         mediaPlayer = null
         ringingJob?.cancel()
+        com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Service Destroyed")
     }
 }
