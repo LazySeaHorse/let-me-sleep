@@ -16,6 +16,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -99,10 +100,10 @@ class MainActivity : ComponentActivity() {
                             snackbar = { snackBarData ->
                                 Snackbar(
                                     snackbarData = snackBarData,
-                                    containerColor = Color(0xFF83DEE8), // Background color
-                                    contentColor = Color.Black,  // Text color
-                                    actionColor = Color.White,   // Action button color
-                                    dismissActionContentColor = Color.White, // Dismiss action color
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    actionColor = MaterialTheme.colorScheme.primary,
+                                    dismissActionContentColor = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.padding(16.dp)
                                 )
                             })

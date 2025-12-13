@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,14 +39,14 @@ fun TimerScreen(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Color(0xFF1A1A1A), // Dark background
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = snackbarHost
     ) { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(Color(0xFF1A1A1A))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Column(
                 modifier = Modifier
@@ -88,7 +89,7 @@ fun TimerScreen(
                     onClick = onStartClick,
                     modifier = Modifier.size(width = 200.dp, height = 50.dp)
                 ) {
-                    Text("Start", color = Color.White)
+                    Text("Start")
                 }
             }
         }

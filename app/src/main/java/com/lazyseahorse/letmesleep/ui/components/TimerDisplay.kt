@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,13 +22,16 @@ fun TimerDisplay(
     angle: Float,
     modifier: Modifier = Modifier
 ) {
+    val inactiveColor = MaterialTheme.colorScheme.surfaceVariant
+    val activeColor = MaterialTheme.colorScheme.primary
+
     Box(
         modifier = modifier.size(200.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(200.dp)) {
             drawArc(
-                color = Color(0xFF2D2D2D),
+                color = inactiveColor,
                 startAngle = 0f,
                 sweepAngle = 360f,
                 useCenter = false,
@@ -36,7 +40,7 @@ fun TimerDisplay(
 
             if (time > 0) {
                 drawArc(
-                    color = Color(0xFF00BCD4),
+                    color = activeColor,
                     startAngle = -90f,
                     sweepAngle = angle,
                     useCenter = false,
@@ -52,7 +56,7 @@ fun TimerDisplay(
                 text = time.toString(),
                 fontSize = 60.sp,
                 modifier = Modifier.padding(20.dp),
-                color = Color(0xFF00BCD4) // Cyan color
+                color = activeColor
             )
         }
     }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,15 +30,15 @@ fun TimerInput(
             .padding(20.dp)
             .size(width = 200.dp, height = 60.dp),
         colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color(0xFF2D2D2D),
-            focusedContainerColor = Color(0xFF2D2D2D),
-            unfocusedTextColor = Color.White,
-            focusedTextColor = Color.White,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
-        label = { Text(label, color = Color.Gray) },
+        label = { Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant) },
         singleLine = true,
         shape = RoundedCornerShape(20.dp)
     )
