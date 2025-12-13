@@ -1,4 +1,4 @@
-package com.example.flowstimerapp.utils
+package com.lazyseahorse.letmesleep.utils
 
 import android.content.Context
 import android.os.VibrationEffect

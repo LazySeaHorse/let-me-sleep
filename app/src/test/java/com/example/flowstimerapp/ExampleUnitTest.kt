@@ -1,4 +1,4 @@
-package com.example.flowstimerapp
+package com.lazyseahorse.letmesleep
 
 import org.junit.Test
 

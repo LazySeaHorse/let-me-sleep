@@ -1,4 +1,4 @@
-package com.example.flowstimerapp.ui.theme
+package com.lazyseahorse.letmesleep.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

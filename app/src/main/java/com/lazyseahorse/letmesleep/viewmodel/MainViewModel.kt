@@ -1,4 +1,4 @@
-package com.example.flowstimerapp.viewmodel
+package com.lazyseahorse.letmesleep.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

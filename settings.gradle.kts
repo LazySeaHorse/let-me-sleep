@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FlowsTimerAPp"
+rootProject.name = "Let Me Sleep"
 include(":app")
