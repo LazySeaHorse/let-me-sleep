@@ -20,6 +20,12 @@ class TimerService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
     private var ringingJob: Job? = null
 
+    // State for Snooze Logic
+    private var currentSnoozeCount = 0
+    private var currentRingDuration = 30
+    private var currentSnoozeDuration = 60
+    private var currentAutoSnoozeLimit = 3
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -30,8 +36,19 @@ class TimerService : Service() {
                 val snoozeDuration = intent.getIntExtra(Constants.EXTRA_SNOOZE_DURATION, 60)
                 val autoSnoozeLimit = intent.getIntExtra(Constants.EXTRA_AUTO_SNOOZE_LIMIT, 3)
 
+                // Update State
+                this.currentSnoozeCount = snoozeCount
+                this.currentRingDuration = ringDuration
+                this.currentSnoozeDuration = snoozeDuration
+                this.currentAutoSnoozeLimit = autoSnoozeLimit
+
                 com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Start Alarm: SnoozeCount=$snoozeCount, Ring=$ringDuration, SnoozeDur=$snoozeDuration")
                 startRinging(snoozeCount, ringDuration, snoozeDuration, autoSnoozeLimit)
+            }
+            Constants.ACTION_SNOOZE_ALARM -> {
+                com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Snooze Requested by User")
+                scheduleSnooze(currentSnoozeCount + 1, currentSnoozeDuration, currentRingDuration, currentAutoSnoozeLimit)
+                stopSelf()
             }
             Constants.ACTION_STOP_ALARM -> {
                 com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Stop Alarm Requested")

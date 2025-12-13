@@ -42,13 +42,25 @@ object NotificationHelper {
     }
 
     fun buildAlarmFiringNotification(context: Context): NotificationCompat.Builder {
+        val fullScreenIntent = android.content.Intent(context, com.lazyseahorse.letmesleep.MainActivity::class.java).apply {
+            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(Constants.EXTRA_SHOW_ALARM_UI, true)
+        }
+        
+        val fullScreenPendingIntent = android.app.PendingIntent.getActivity(
+            context,
+            123,
+            fullScreenIntent,
+            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        )
+
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("Time's Up!")
             .setContentText("Tap to dismiss or wait for auto-snooze")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setFullScreenIntent(null, true) // Ideally we'd have a PendingIntent to open the Activity
+            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(false)
             .setOngoing(true)
     }

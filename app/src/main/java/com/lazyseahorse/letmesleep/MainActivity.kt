@@ -42,15 +42,45 @@ import com.lazyseahorse.letmesleep.utils.VibrationHelper
 import com.lazyseahorse.letmesleep.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
+    private val isAlarmTriggered = mutableStateOf(false)
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        checkIntent(intent)
+    }
+
+    private fun checkIntent(intent: android.content.Intent?) {
+        if (intent?.getBooleanExtra(com.lazyseahorse.letmesleep.utils.Constants.EXTRA_SHOW_ALARM_UI, false) == true) {
+            isAlarmTriggered.value = true
+        }
+    }
+
     @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val vibrationHelper = VibrationHelper(this)
+        checkIntent(intent)
 
         setContent {
             LetMeSleepTheme {
-                var userValue by remember { mutableStateOf("") }
+                if (isAlarmTriggered.value) {
+                    com.lazyseahorse.letmesleep.ui.AlarmTriggeredScreen(
+                        onSnooze = {
+                            startService(android.content.Intent(this, com.lazyseahorse.letmesleep.service.TimerService::class.java).apply {
+                                action = com.lazyseahorse.letmesleep.utils.Constants.ACTION_SNOOZE_ALARM
+                            })
+                            isAlarmTriggered.value = false
+                        },
+                        onDismiss = {
+                            startService(android.content.Intent(this, com.lazyseahorse.letmesleep.service.TimerService::class.java).apply {
+                                action = com.lazyseahorse.letmesleep.utils.Constants.ACTION_STOP_ALARM
+                            })
+                            isAlarmTriggered.value = false
+                        }
+                    )
+                } else {
+                    var userValue by remember { mutableStateOf("") }
                 var ringDuration by remember { mutableStateOf("10") }
                 var snoozeDuration by remember { mutableStateOf("5") }
                 var snoozeLimit by remember { mutableStateOf("3") }
@@ -162,6 +192,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            }
         }
     }
 }
+
