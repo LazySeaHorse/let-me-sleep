@@ -25,6 +25,8 @@ class TimerService : Service() {
     private var currentRingDuration = 30
     private var currentSnoozeDuration = 60
     private var currentAutoSnoozeLimit = 3
+    
+    private val timerPreferences by lazy { com.lazyseahorse.letmesleep.utils.TimerPreferences(this) }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -52,6 +54,7 @@ class TimerService : Service() {
             }
             Constants.ACTION_STOP_ALARM -> {
                 com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Stop Alarm Requested")
+                timerPreferences.clearTimerState() // Clear state on stop
                 stopSelf()
             }
         }
@@ -144,6 +147,15 @@ class TimerService : Service() {
              alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
         com.lazyseahorse.letmesleep.utils.AppLogger.log("TimerService", "Snooze scheduled for ${snoozeDurationSeconds}s from now")
+        
+        // Update Prefs for Snooze
+        timerPreferences.saveTimerState(
+            triggerTime = triggerTime,
+            originalDuration = snoozeDurationSeconds, // Snooze countdown
+            ringDuration = ringDurationSeconds,
+            snoozeDuration = snoozeDurationSeconds,
+            autoSnoozeLimit = autoSnoozeLimit
+        )
     }
 
     override fun onDestroy() {

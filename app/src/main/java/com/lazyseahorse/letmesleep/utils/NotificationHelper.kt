@@ -29,7 +29,7 @@ object NotificationHelper {
     }
 
     fun buildTimerRunningNotification(context: Context, endTimeMillis: Long): NotificationCompat.Builder {
-        return NotificationCompat.Builder(context, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground) // Fallback if no specific icon
             .setContentTitle("Timer Running")
             .setContentText("Tap to open")
@@ -39,7 +39,14 @@ object NotificationHelper {
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW) // Low priority for running timer to avoid constant buzzing
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setChronometerCountDown(true)
+        }
+        
+        return builder
     }
+
 
     fun buildAlarmFiringNotification(context: Context): NotificationCompat.Builder {
         val fullScreenIntent = android.content.Intent(context, com.lazyseahorse.letmesleep.MainActivity::class.java).apply {

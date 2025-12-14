@@ -34,8 +34,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var countdownJob: Job? = null
     private val alarmManager = application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+    private val timerPreferences = com.lazyseahorse.letmesleep.utils.TimerPreferences(application)
+
     init {
         NotificationHelper.createNotificationChannel(application)
+        restoreTimerState()
     }
 
     fun startCountdown(
@@ -81,25 +84,63 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
              alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
         }
 
-        // 2. Show Timer Notification
+        // 2. Save State
+        timerPreferences.saveTimerState(
+            triggerTime = triggerTime,
+            originalDuration = timeInSeconds,
+            ringDuration = ringDurationSeconds,
+            snoozeDuration = snoozeDurationSeconds,
+            autoSnoozeLimit = autoSnoozeLimit
+        )
+
+        // 3. Show Timer Notification
         val notification = NotificationHelper.buildTimerRunningNotification(context, triggerTime).build()
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         notificationManager.notify(NotificationHelper.NOTIFICATION_ID, notification)
 
-        // 3. Start UI Update Loop
+        // 4. Start UI Update Loop
         _isCountdownComplete.value = false
+        startCountdownLoop(triggerTime)
+    }
+
+    private fun startCountdownLoop(triggerTime: Long) {
+        countdownJob?.cancel()
         countdownJob = viewModelScope.launch {
             while (true) {
                 val remainingMillis = triggerTime - System.currentTimeMillis()
                 if (remainingMillis <= 0) {
                     _countdownFlow.value = 0
-                    _isCountdownComplete.value = true // UI can react if open
+                    _isCountdownComplete.value = true
+                    // We don't clear prefs here immediately to allow UI to show "Finished" state if needed,
+                    // or we can clear it. Usually better to keep it until user dismisses/stops.
+                    // But for now, let's keep it simple.
                     break
                 }
                 _countdownFlow.value = (remainingMillis / 1000).toInt()
-                delay(100) // Update frequency
+                delay(100)
             }
         }
+    }
+
+    private fun restoreTimerState() {
+        val state = timerPreferences.getTimerState() ?: return
+        
+        val triggerTime = state.triggerTime
+        if (System.currentTimeMillis() < triggerTime) {
+            // Timer is still running
+            com.lazyseahorse.letmesleep.utils.AppLogger.log("MainViewModel", "Restoring timer: trigger=$triggerTime")
+            _totalTimeFlow.value = state.originalDuration
+            _isCountdownComplete.value = false
+            startCountdownLoop(triggerTime)
+        } else {
+            // Timer expired while we were gone
+            com.lazyseahorse.letmesleep.utils.AppLogger.log("MainViewModel", "Timer expired while inactive")
+            _totalTimeFlow.value = state.originalDuration
+            _countdownFlow.value = 0
+            _isCountdownComplete.value = true
+            // We could clear prefs here, but maybe we want to show the "Times Up" state.
+        }
+    }
     }
 
     fun stopTimer() {
@@ -129,5 +170,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _countdownFlow.value = 0
         _totalTimeFlow.value = 0
         _isCountdownComplete.value = false
+        
+        timerPreferences.clearTimerState()
     }
 }
