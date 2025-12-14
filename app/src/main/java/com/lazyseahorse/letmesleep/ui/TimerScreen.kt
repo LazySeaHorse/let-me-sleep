@@ -34,63 +34,55 @@ fun TimerScreen(
     onSnoozeDurationChange: (String) -> Unit,
     snoozeLimit: String,
     onSnoozeLimitChange: (String) -> Unit,
-    onStartClick: () -> Unit,
-    snackbarHost: @Composable () -> Unit
+    onStartClick: () -> Unit
 ) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        snackbarHost = snackbarHost
-    ) { innerPadding ->
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column(
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .align(Alignment.Center)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+            // Animated timer text
+            TimerDisplay(time = time, angle = angle)
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            TimerInput(
+                value = userValue,
+                onValueChange = onUserValueChange,
+                label = "Timer Duration (s)"
+            )
+
+            TimerInput(
+                value = ringDuration,
+                onValueChange = onRingDurationChange,
+                label = "Ring Duration (s)"
+            )
+
+            TimerInput(
+                value = snoozeDuration,
+                onValueChange = onSnoozeDurationChange,
+                label = "Snooze Duration (s)"
+            )
+
+            TimerInput(
+                value = snoozeLimit,
+                onValueChange = onSnoozeLimitChange,
+                label = "Auto Snooze Limit"
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Button(
+                onClick = onStartClick,
+                modifier = Modifier.size(width = 200.dp, height = 50.dp)
             ) {
-                // Animated timer text
-                TimerDisplay(time = time, angle = angle)
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                TimerInput(
-                    value = userValue,
-                    onValueChange = onUserValueChange,
-                    label = "Timer Duration (s)"
-                )
-
-                TimerInput(
-                    value = ringDuration,
-                    onValueChange = onRingDurationChange,
-                    label = "Ring Duration (s)"
-                )
-
-                TimerInput(
-                    value = snoozeDuration,
-                    onValueChange = onSnoozeDurationChange,
-                    label = "Snooze Duration (s)"
-                )
-
-                TimerInput(
-                    value = snoozeLimit,
-                    onValueChange = onSnoozeLimitChange,
-                    label = "Auto Snooze Limit"
-                )
-
-                Spacer(modifier = Modifier.height(30.dp))
-
-                Button(
-                    onClick = onStartClick,
-                    modifier = Modifier.size(width = 200.dp, height = 50.dp)
-                ) {
-                    Text("Start")
-                }
+                Text("Start")
             }
         }
     }

@@ -216,8 +216,7 @@ class MainActivity : ComponentActivity() {
                                              viewModel.startCountdown(duration, ring, snooze, limit)
                                          }
                                      }
-                                 },
-                                 snackbarHost = {} 
+                                 }
                              )
                          } else {
                              com.lazyseahorse.letmesleep.ui.DebugScreen()

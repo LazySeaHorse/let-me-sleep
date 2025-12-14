@@ -30,12 +30,18 @@ fun TimerDisplay(
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(200.dp)) {
+            val strokeWidth = 20f
+            val halfStroke = strokeWidth / 2
+            val arcSize = size.width - strokeWidth
+
             drawArc(
                 color = inactiveColor,
                 startAngle = 0f,
                 sweepAngle = 360f,
                 useCenter = false,
-                style = Stroke(width = 20f, cap = StrokeCap.Round)
+                topLeft = androidx.compose.ui.geometry.Offset(halfStroke, halfStroke),
+                size = androidx.compose.ui.geometry.Size(arcSize, arcSize),
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
 
             if (time > 0) {
@@ -44,8 +50,11 @@ fun TimerDisplay(
                     startAngle = -90f,
                     sweepAngle = angle,
                     useCenter = false,
-                    style = Stroke(width = 20f, cap = StrokeCap.Round)
+                    topLeft = androidx.compose.ui.geometry.Offset(halfStroke, halfStroke),
+                    size = androidx.compose.ui.geometry.Size(arcSize, arcSize),
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
+            }
             }
         }
         Box(
