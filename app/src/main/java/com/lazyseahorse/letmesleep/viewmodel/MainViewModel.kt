@@ -25,6 +25,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _countdownFlow = MutableStateFlow(0)
     val countdownFlow = _countdownFlow.asStateFlow()
 
+    private val _totalTimeFlow = MutableStateFlow(0)
+    val totalTimeFlow = _totalTimeFlow.asStateFlow()
+
     private val _isCountdownComplete = MutableStateFlow(false)
     val isCountdownComplete = _isCountdownComplete.asStateFlow()
 
@@ -45,6 +48,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         stopTimer()
         
         com.lazyseahorse.letmesleep.utils.AppLogger.log("MainViewModel", "Timer Started: ${timeInSeconds}s")
+
+        _totalTimeFlow.value = timeInSeconds
 
         val context = getApplication<Application>()
         val triggerTime = System.currentTimeMillis() + (timeInSeconds * 1000L)
@@ -122,6 +127,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         context.startService(stopIntent)
 
         _countdownFlow.value = 0
+        _totalTimeFlow.value = 0
         _isCountdownComplete.value = false
     }
 }

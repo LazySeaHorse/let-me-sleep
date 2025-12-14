@@ -5,12 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -177,16 +172,12 @@ class MainActivity : ComponentActivity() {
                                  }
                              }
 
-                             //Animation State
-                             val rotation = rememberInfiniteTransition()
-                             val angle by rotation.animateFloat(
-                                 initialValue = 0f,
-                                 targetValue = 360f,
-                                 animationSpec = infiniteRepeatable(
-                                     animation = tween(2000, easing = LinearEasing),
-                                     repeatMode = RepeatMode.Restart
-                                 )
-                             )
+                             val totalTime by viewModel.totalTimeFlow.collectAsState()
+                             val angle = if (totalTime > 0) {
+                                 (time.value.toFloat() / totalTime.toFloat()) * 360f
+                             } else {
+                                 0f
+                             }
 
                              TimerScreen(
                                  time = time.value,
