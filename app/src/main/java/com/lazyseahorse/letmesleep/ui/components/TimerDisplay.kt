@@ -55,7 +55,6 @@ fun TimerDisplay(
                     style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
             }
-            }
         }
         Box(
             modifier = Modifier.fillMaxSize(),

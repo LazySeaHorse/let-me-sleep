@@ -141,7 +141,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // We could clear prefs here, but maybe we want to show the "Times Up" state.
         }
     }
-    }
+
 
     fun stopTimer() {
         countdownJob?.cancel()
